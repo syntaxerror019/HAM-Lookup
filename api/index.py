@@ -1,22 +1,20 @@
 from flask import Flask, jsonify, render_template_string, request, render_template
 import requests
 from PyPDF2 import PdfReader
-import os
+import io
 
 app = Flask(__name__)
 
 BASE_URL = "https://www.wt9v.net/license/printlicense.php?callsign="
 
-def download_pdf(url, save_path):
+def fetch_pdf_data(url):
     response = requests.get(url)
     if response.status_code != 200:
         return None
-    with open(save_path, "wb") as file:
-        file.write(response.content)
-    return save_path
+    return io.BytesIO(response.content)
 
-def extract_pdf_data(pdf_path):
-    reader = PdfReader(pdf_path)
+def extract_pdf_data(pdf_bytes):
+    reader = PdfReader(pdf_bytes)
 
     if len(reader.pages) != 1:
         return None
@@ -48,18 +46,14 @@ def index():
 def lookup():
     url = BASE_URL + request.form.get("callsign", "")
 
-    pdf_path = "downloaded_file.pdf"
-
     try:
-        pdf_file = download_pdf(url, pdf_path)
-        if not pdf_file:
-            return jsonify({"error": "Failed to download PDF"}), 400
+        pdf_bytes = fetch_pdf_data(url)
+        if not pdf_bytes:
+            return jsonify({"error": "Failed to fetch PDF"}), 400
 
-        data = extract_pdf_data(pdf_path)
+        data = extract_pdf_data(pdf_bytes)
         if not data:
             return jsonify({"error": "Invalid PDF format"}), 400
-
-        os.remove(pdf_path)
 
         return render_template("lookup.html", **data)
     except Exception as e:
