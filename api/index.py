@@ -8,7 +8,13 @@ app = Flask(__name__)
 BASE_URL = "https://www.wt9v.net/license/printlicense.php?callsign="
 
 def fetch_pdf_data(url):
-    response = requests.get(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "Accept": "application/pdf",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Connection": "keep-alive",
+    }
+    response = requests.get(url, headers=headers)
     if response.status_code != 200:
         return response.status_code, None
     return response.status_code, io.BytesIO(response.content)
