@@ -10,8 +10,8 @@ BASE_URL = "https://www.wt9v.net/license/printlicense.php?callsign="
 def fetch_pdf_data(url):
     response = requests.get(url)
     if response.status_code != 200:
-        return None
-    return io.BytesIO(response.content)
+        return response.status_code, None
+    return response.status_code, io.BytesIO(response.content)
 
 def extract_pdf_data(pdf_bytes):
     reader = PdfReader(pdf_bytes)
@@ -47,9 +47,9 @@ def lookup():
     url = BASE_URL + request.form.get("callsign", "")
 
     try:
-        pdf_bytes = fetch_pdf_data(url)
+        res, pdf_bytes = fetch_pdf_data(url)
         if not pdf_bytes:
-            return jsonify({"error": "Failed to fetch PDF"}), 400
+            return jsonify({"error": f"Failed to fetch PDF, SC: {res}"}), 400
 
         data = extract_pdf_data(pdf_bytes)
         if not data:
