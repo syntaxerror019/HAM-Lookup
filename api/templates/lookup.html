@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>License Details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HAM Radio Callsign Lookup</h1>
+            <div class="navbar">
+                <a class="buttonClass" href="{{ url_for('index') }}">Home</a>
+                <a class="buttonClass" href="https://mileshilliard.com/posts">Blog</a>
+                <a class="buttonClass" href="https://mileshilliard.com">About</a>
+                <a class="buttonClass" href="mailto:miles@mileshilliard.com">Contact</a>
+            </div>
+        </div>
+        <div class="content">
+            <h3>License Information</h3>
+            <ul>
+                <li><strong>Callsign:</strong> {{ callsign }}</li>
+                <li><strong>Name:</strong> {{ name }}</li>
+                <li><strong>Address:</strong> {{ address }}</li>
+                <li><strong>FRN:</strong> {{ frn }}</li>
+                <li><strong>Special Conditions:</strong> {{ special_conditions }}</li>
+                <li><strong>Grant Date:</strong> {{ grant_date }}</li>
+                <li><strong>Effective Date:</strong> {{ effective_date }}</li>
+                <li><strong>Print Date:</strong> {{ print_date }}</li>
+                <li><strong>Expiration Date:</strong> {{ expiration_date }}</li>
+                <li><strong>Operator Privileges:</strong> {{ operator_privileges }}</li>
+                <li><strong>Station Privileges:</strong> {{ station_privileges }}</li>
+            </ul>
+            <br>
+            <button class="buttonClass" onclick="window.location.href='/'"><< Back</button>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Miles Hilliard. All rights reserved.</p>
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>License Details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HAM Radio Callsign Lookup</h1>
+            <div class="navbar">
+                <a class="buttonClass" href="{{ url_for('index') }}">Home</a>
+                <a class="buttonClass" href="https://mileshilliard.com/posts">Blog</a>
+                <a class="buttonClass" href="https://mileshilliard.com">About</a>
+                <a class="buttonClass" href="mailto:miles@mileshilliard.com">Contact</a>
+            </div>
+        </div>
+        <div class="content">
+            <h3>Lookup</h3>
+            <br>
+            <form id="FORM" action="{{ url_for('lookup') }}" method="POST">
+                <label for="callsign">Callsign:</label>
+                <input type="text" maxlength=10 id="callsign" name="callsign" required>
+                <button class="buttonClass" onclick="submit_form(this)" value="Lookup">Search</button>
+            </form>
+            <div id="loading" class="searching hidden">
+                <mark> Searching for license ... </mark>
+                <br>
+                <img src="{{ url_for('static', filename='bar.gif') }}" alt="Loading...">
+            </div>
+            <br>
+            <h3>Instructions</h3>
+            <p>To use the HAM Radio Callsign Lookup site, follow these steps:</p>
+            <ol>
+                <li>Enter the callsign you want to look up in the "Callsign" field.</li>
+                <li>Click the "Lookup" button to submit the form.</li>
+                <li>The license information for the entered callsign will be displayed below.</li>
+            </ol>
+            <br>
+            <h3>Information</h3>
+            <p></p>
+            <p>This website utilizes the <a href="www.wt9v.net">www.wt9v.net</a> website to perform HAM radio callsign
+                lookups. When a callsign is entered and the form is submitted, our backend service sends a request to
+                www.wt9v.net to retrieve the relevant license information. The website generates a PDF containing the
+                license details, which our service then scrapes to extract the necessary information. This data is
+                subsequently displayed on our site for your convenience.</p>
+
+            <p>It is important to note that the data provided on this site is not owned by us. The information is
+                publicly available and sourced from www.wt9v.net. While we strive to ensure the accuracy and reliability
+                of the data presented, we cannot guarantee that it is 100% accurate or up-to-date. Users should verify
+                the information independently if it is critical for their purposes. We disclaim any liability for errors
+                or omissions in the data provided.</p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Miles Hilliard. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+<script>
+    function submit_form(button) {
+        document.getElementById("loading").classList.remove("hidden");
+        button.disabled = true;
+
+        document.getElementById("FORM").submit();
+    }
+</script>
+
+</html>
