@@ -18,28 +18,8 @@
             </div>
         </div>
         <div class="content">
-            <h3>License Information for {{ data[0] }}</h3>
-            <table>
-            <thead>
-                <tr>
-                <th>Field</th>
-                <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for item in data %}
-                {% if ':' in item %}
-                <tr>
-                    <td><b>{{ item.split(':')[0] }}</b></td>
-                    <td>{{ item.split(':')[1] }}</td>
-                </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-            </table>
-            <br>
-            <a href="{{ url_for('lookup') }}/{{ callsign }}">Permalink to this page.</a>
-            <br>
+            <h3>Results for {{ callsign }}</h3>
+            <p>{{ error }}</p>
             <br>
             <button class="buttonClass" onclick="window.location.href='/'"><< Back</button>
         </div>

@@ -21,7 +21,7 @@
             <h3>Lookup</h3>
             <br>
             <form id="FORM" action="{{ url_for('lookup') }}" method="POST">
-                <label for="callsign">Callsign:</label>
+                <label for="callsign">Callsign or Name:</label>
                 <input type="text" maxlength=10 id="callsign" name="callsign" required>
                 <button class="buttonClass" onclick="submit_form(this)" value="Lookup">Search</button>
             </form>

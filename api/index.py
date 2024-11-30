@@ -1,67 +1,54 @@
 from flask import Flask, jsonify, render_template_string, request, render_template
 import requests
-from PyPDF2 import PdfReader
-import io
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-BASE_URL = "https://www.wt9v.net/license/printlicense.php?callsign="
+url = "https://www.arrl.org/fcc/search"
 
-def fetch_pdf_data(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-        "Accept": "application/pdf",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
-    }
-    response = requests.get(url, headers=headers)
+def extract_data(payload):
+    response = requests.post(url, data=payload)
     if response.status_code != 200:
-        return response.status_code, None
-    return response.status_code, io.BytesIO(response.content)
+        return response.status_code, "Failed to fetch the page."
+    
+    soup = BeautifulSoup(response.text, 'html.parser')
+    list2_div = soup.find('div', class_='list2')
+    
+    if not list2_div:
+        return 404, "No results found."
 
-def extract_pdf_data(pdf_bytes):
-    reader = PdfReader(pdf_bytes)
+    results = list2_div.get_text(strip=True, separator="\n").split("\n")
+    results[1] = "Address: " + results[1]
+    results[2] = "Location: " + results[2]
 
-    if len(reader.pages) != 1:
-        return None
+    print(results)
 
-    page = reader.pages[0]
-    text = page.extract_text()
-    lines = text.split('\n')
-
-    data = {
-        "callsign": lines[3],
-        "name": lines[4],
-        "address": f"{lines[5]} {lines[6]}",
-        "frn": lines[7],
-        "special_conditions": lines[8],
-        "grant_date": lines[9].split()[0],
-        "effective_date": lines[9].split()[1],
-        "print_date": lines[9].split()[2],
-        "expiration_date": lines[9].split()[3],
-        "operator_privileges": lines[10].split()[0],
-        "station_privileges": lines[10].split()[1],
-    }
-    return data
+    return response.status_code, results
 
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
 
-@app.route("/lookup", methods=["POST"])
-def lookup():
-    url = BASE_URL + request.form.get("callsign", "")
-
+@app.route("/lookup", methods=["POST", "GET"])
+@app.route("/lookup/<point>", methods=["POST", "GET"])
+def lookup(point=None):
     try:
-        res, pdf_bytes = fetch_pdf_data(url)
-        if not pdf_bytes:
-            return jsonify({"error": f"Failed to fetch PDF, SC: {res}"}), 400
+        input = request.form.get("callsign", None) or point
+        if not input:
+            return render_template("error.html", error="No callsign provided.", callsign="None Specified!")
+        
+        payload = {"data[Search][terms]": input}
 
-        data = extract_pdf_data(pdf_bytes)
-        if not data:
-            return jsonify({"error": "Invalid PDF format"}), 400
+        res, data = extract_data(payload)
 
-        return render_template("lookup.html", **data)
+        if res == 404:
+            return render_template("error.html", error=data, callsign=input)
+        
+        if res != 200:
+            return render_template("error.html", error=f"Failed to fetch the page, {res}", callsign=input)
+
+        return render_template("lookup.html", data=data, callsign=input)
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
